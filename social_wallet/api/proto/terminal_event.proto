@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package socialwallet;
+
+option go_package = "github.com/yourname/social-wallet/api/proto/gen;proto";
+
+import "google/api/annotations.proto";
+
+service TerminalEventService {
+  rpc HandleTerminalEvent (TerminalEventRequest) returns (TerminalEventResponse) {
+    option (google.api.http) = {
+      post: "/api/terminal/event"
+      body: "*"
+    };
+  }
+
+}
+service SocialWalletService {
+  rpc HandleTransaction(TransactionRequest) returns (TransactionResponse) {
+    option (google.api.http) = {
+      post: "/social-wallet/transaction"
+      body: "*"
+    };
+  }
+}
+
+
+message TransactionRequest {
+  string iin = 1;
+  string date = 2;
+  string school_bin = 3;
+   string set_socpay = 4;
+  string reset_socpay = 5;
+}
+
+message TransactionResponse {
+  bool success = 1;
+}
+
+
+message TerminalEventRequest {
+  string json_payload = 1;
+}
+
+message TerminalEventResponse {
+  bool success = 1;
+  string message = 2;
+}
