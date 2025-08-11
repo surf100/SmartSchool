@@ -1,0 +1,184 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  GOOSE_DRIVER: postgres
+  GOOSE_TABLE: public.goose_migrations
+  GOOSE_MIGRATION_DIR: ./migrations
+
+# Cache Go modules
+cache:
+  paths:
+    - .cache/pip
+    - .cache/go
+
+build-goose:
+  stage: build
+  image: golang:1.24-alpine
+  script:
+    - echo "🚀 [$(date '+%Y-%m-%d %H:%M:%S')] Starting Goose build process..."
+    - echo "📦 Installing git..."
+    - apk add --no-cache git ansible
+    - echo "🔗 Cloning Goose repository..."
+    - git clone https://github.com/pressly/goose.git
+    - echo "📁 Changing to goose directory..."
+    - cd goose
+    - echo "🔨 Building Goose with PostgreSQL driver only..."
+    - go build -tags='no_clickhouse no_libsql no_mssql no_mysql no_sqlite3 no_vertica no_ydb' -o goose ./cmd/goose
+    - echo "✅ Goose build completed successfully!"
+    - cd ..
+    - echo "📋 Moving build artifacts..."
+    - mv goose goose-code
+    - mv goose-code/goose ./goose
+    - echo "🎯 [$(date '+%Y-%m-%d %H:%M:%S')] Goose build process completed!"
+    - echo "🔑 Decrypting .env file..."
+    - echo $ANSIBLE_SECRET > /root/secret
+    - ansible-vault decrypt .env --vault-password-file /root/secret 1>&2
+    - echo "🔑 .env file decrypted successfully!"
+    - rm /root/secret
+    - echo "🔑 .env file removed successfully!"
+  artifacts:
+    paths:
+      - ./goose
+      - .env
+    expire_in: 1 hour
+  tags:
+    - dev
+
+# Test migrations against temporary PostgreSQL database
+test-migrations:
+  stage: test
+  image: alpine:latest
+  dependencies:
+    - build-goose
+  variables:
+    POSTGRES_HOST: postgres
+    POSTGRES_PORT: 5432
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+    POSTGRES_DB: postgres
+    GOOSE_DBSTRING: postgres://postgres:postgres@postgres:5432/postgres?sslmode=disable
+  services:
+    - postgres:15-alpine
+  tags:
+    - dev
+  before_script:
+    - echo "🔧 [$(date '+%Y-%m-%d %H:%M:%S')] Installing dependencies for migration testing..."
+    - apk add --no-cache git postgresql-client
+    - echo "✅ Dependencies installed successfully!"
+  script:
+    # Wait for PostgreSQL to be ready
+    - |
+      echo "⏳ [$(date '+%Y-%m-%d %H:%M:%S')] Waiting for PostgreSQL to be ready..."
+      echo "📍 PostgreSQL Host: $POSTGRES_HOST"
+      echo "🔌 PostgreSQL Port: $POSTGRES_PORT"
+      echo "👤 PostgreSQL User: $POSTGRES_USER"
+      echo "🗄️  PostgreSQL Database: $POSTGRES_DB"
+
+      until pg_isready -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER; do
+        echo "⏰ [$(date '+%Y-%m-%d %H:%M:%S')] PostgreSQL is not ready yet. Waiting..."
+        sleep 2
+      done
+      echo "✅ [$(date '+%Y-%m-%d %H:%M:%S')] PostgreSQL is ready and accepting connections!"
+
+    - echo "📁 [$(date '+%Y-%m-%d %H:%M:%S')] Listing migration folder contents:"
+    - ls -la ./migrations
+
+    - echo "📊 [$(date '+%Y-%m-%d %H:%M:%S')] Current migration status:"
+    - ./goose status || echo "⚠️  No migrations table found yet (this is normal for first run)"
+
+    - echo "🚀 [$(date '+%Y-%m-%d %H:%M:%S')] Starting migration test..."
+    - |
+      if ./goose up; then
+        echo "✅ [$(date '+%Y-%m-%d %H:%M:%S')] Migration test completed successfully!"
+        echo "📊 [$(date '+%Y-%m-%d %H:%M:%S')] Final migration status:"
+        ./goose status
+      else
+        echo "❌ [$(date '+%Y-%m-%d %H:%M:%S')] Migration test failed!"
+        echo "📊 [$(date '+%Y-%m-%d %H:%M:%S')] Migration status after failure:"
+        ./goose status
+        exit 1
+      fi
+
+# Apply migrations to remote database
+deploy-migrations:
+  stage: deploy
+  image: alpine:latest
+  tags:
+    - dev
+  dependencies:
+    - build-goose
+  before_script:
+    - echo "🔧 [$(date '+%Y-%m-%d %H:%M:%S')] Installing dependencies for migration deployment..."
+    - apk add --no-cache git postgresql-client
+    - echo "📄 Loading environment variables..."
+    - source .env
+    - echo "✅ Environment loaded successfully!"
+  script:
+    # Check current migration status
+    - echo "📊 [$(date '+%Y-%m-%d %H:%M:%S')] Checking current migration status..."
+    - |
+      if ./goose status; then
+        echo "✅ Migration status retrieved successfully"
+      else
+        echo "⚠️  Could not retrieve migration status (may be first deployment)"
+      fi
+
+    # Apply migrations
+    - echo "🚀 [$(date '+%Y-%m-%d %H:%M:%S')] Starting migration deployment to remote database..."
+    - echo "🔗 Database connection configured"
+    - |
+      if ./goose up; then
+        echo "✅ [$(date '+%Y-%m-%d %H:%M:%S')] Migration deployment completed successfully!"
+        echo "📊 [$(date '+%Y-%m-%d %H:%M:%S')] Final migration status:"
+        ./goose status
+      else
+        echo "❌ [$(date '+%Y-%m-%d %H:%M:%S')] Migration deployment failed!"
+        echo "📊 [$(date '+%Y-%m-%d %H:%M:%S')] Migration status after failure:"
+        ./goose status
+        exit 1
+      fi
+  after_script:
+    - echo "🏁 [$(date '+%Y-%m-%d %H:%M:%S')] Migration deployment process completed!"
+  only:
+    - main
+    - dev
+  allow_failure: false
+
+# Optional: Rollback job for emergency situations
+rollback-migrations:
+  stage: deploy
+  image: alpine:latest
+  tags:
+    - dev
+  before_script:
+    - echo "🔧 [$(date '+%Y-%m-%d %H:%M:%S')] Installing dependencies for migration rollback..."
+    - apk add --no-cache git postgresql-client
+    - echo "📄 Loading environment variables..."
+    - source .env
+    - echo "✅ Environment loaded successfully!"
+  script:
+    - echo "📊 [$(date '+%Y-%m-%d %H:%M:%S')] Current migration status before rollback:"
+    - ./goose status
+
+    - echo "⏪ [$(date '+%Y-%m-%d %H:%M:%S')] Starting migration rollback (rolling back 1 migration)..."
+    - |
+      if ./goose down 1; then
+        echo "✅ [$(date '+%Y-%m-%d %H:%M:%S')] Migration rollback completed successfully!"
+      else
+        echo "❌ [$(date '+%Y-%m-%d %H:%M:%S')] Migration rollback failed!"
+        exit 1
+      fi
+
+    # Verify status after rollback
+    - echo "📊 [$(date '+%Y-%m-%d %H:%M:%S')] Migration status after rollback:"
+    - ./goose status
+  after_script:
+    - echo "🏁 [$(date '+%Y-%m-%d %H:%M:%S')] Migration rollback process completed!"
+  only:
+    - main
+    - dev
+  when: manual
+  allow_failure: false
