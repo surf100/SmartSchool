@@ -8,10 +8,12 @@ import (
 )
 
 type Repository interface {
-	GetMappingByReaderName(ctx context.Context, readerName string) (*entity.AccessMapping, error)
-	GetStudentByPin(ctx context.Context, pin string) (*entity.Student, error)
-	SaveAccessEvent(ctx context.Context, event *entity.AccessEvent) error
-	SaveTransaction(ctx context.Context, iin string, schoolBin string, date time.Time, set_socpay string, reset_socpay string) error
+	SaveTransaction(ctx context.Context, iin, schoolBin string, now time.Time, setSocPay string) error
 	SyncSusnStatuses(ctx context.Context) error
-
+	FindPersonsByIIN(ctx context.Context, iin, schoolBin string) ([]*entity.Person, error)
+	FindExternalSusnDataByIIN(ctx context.Context, iin, schoolBin string) ([]*entity.ExternalSusnData, error)
+	GetPersonByPin(ctx context.Context, pin string) (*entity.Person, error)
+	FindExternalSusnDataByIINOnly(ctx context.Context, iin string) ([]*entity.ExternalSusnData, error)
+	UpdateSchoolBinByIIN(ctx context.Context, iin, newSchoolBin string) error
+	AssignCardNumberByIIN(ctx context.Context, iin, schoolBin, card string) error
 }

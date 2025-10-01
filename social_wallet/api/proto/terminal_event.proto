@@ -5,44 +5,56 @@ package socialwallet;
 option go_package = "github.com/yourname/social-wallet/api/proto/gen;proto";
 
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 
-service TerminalEventService {
-  rpc HandleTerminalEvent (TerminalEventRequest) returns (TerminalEventResponse) {
+service TerminalService {
+  rpc ActivateVoucher(ActivateVoucherRequest) returns (ActivateVoucherResponse) {
     option (google.api.http) = {
-      post: "/api/terminal/event"
+      get: "/activate-voucher"
+    };
+  }
+  rpc HandleZKBioAttendance (ZKEventRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/social-wallet/zkbio"
       body: "*"
     };
   }
-
-}
-service SocialWalletService {
-  rpc HandleTransaction(TransactionRequest) returns (TransactionResponse) {
-    option (google.api.http) = {
-      post: "/social-wallet/transaction"
-      body: "*"
-    };
-  }
 }
 
-
-message TransactionRequest {
-  string iin = 1;
-  string date = 2;
-  string school_bin = 3;
-   string set_socpay = 4;
-  string reset_socpay = 5;
+message ActivateVoucherRequest {
+  string iin = 1 [json_name = "iin"];
+  string school_bin = 2 [json_name = "school_bin"];
+  string set_socpay = 3 [json_name = "set_socpay"];
+  optional string reset_socpay = 4;
 }
 
-message TransactionResponse {
-  bool success = 1;
+message ActivateVoucherResponse {
+  string result = 1;
+  string exist = 2;
+  optional string warning = 3;
+  optional string warn_comment = 4;
+  string social_payments = 5;
+  string card_number = 6;
 }
 
 
-message TerminalEventRequest {
-  string json_payload = 1;
+message ZKBioEvent {
+  string pin = 1;
+  string devSn = 2;
+  string readerName = 3;
+  string doorName = 4;
+  string eventTime = 5;
 }
 
-message TerminalEventResponse {
+message HandleResponse {
   bool success = 1;
   string message = 2;
+}
+message ZKEventRequest {
+  string module = 1;
+  string dataType = 2;
+  string moduleName = 3;
+  string content = 4; 
+  string pushType = 5;
+  string pushTypeName = 6;
 }

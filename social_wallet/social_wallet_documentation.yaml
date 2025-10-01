@@ -1,0 +1,107 @@
+openapi: 3.0.3
+info:
+  title: Social Wallet API
+  description: API для работы с социальным кошельком (ваучеры, биометрия ZKBio).
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+paths:
+  /activate-voucher:
+    get:
+      summary: Активация ваучера
+      operationId: activateVoucher
+      parameters:
+        - name: iin
+          in: query
+          description: ИИН
+          required: true
+          schema:
+            type: string
+        - name: school_bin
+          in: query
+          description: BIN шокльнипа
+          required: trueйцввцййцпьлкупььльл
+          schema:
+            type: string
+        - name: set_socpay
+          in: query
+          description: Установить socpay
+          required: true
+          schema:
+            type: string
+        - name: reset_socpay
+          in: query
+          description: Сбросить socpay
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешная активация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivateVoucherResponse'
+
+  /api/social-wallet/zkbio:
+    post:
+      summary: Обработка биометрического события ZKBio
+      operationId: handleZKBioAttendance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZKEventRequest'
+      responses:
+        '200':
+          description: Успешная обработка
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+        '400':
+          description: Ошибка обработки
+
+components:
+  schemas:
+    ActivateVoucherResponse:
+      type: object
+      properties:
+        result:
+          type: string
+          description: Результат операции
+        exist:
+          type: string
+          description: Признак существования
+        warning:
+          type: string
+          description: Предупреждение (если есть)
+        warn_comment:
+          type: string
+          description: Комментарий к предупреждению
+        social_payments:
+          type: string
+          description: Социальные выплаты
+        card_number:
+          type: string
+          description: Номер карты
+
+    ZKEventRequest:
+      type: object
+      properties:
+        module:
+          type: string
+        dataType:
+          type: string
+        moduleName:
+          type: string
+        content:
+          type: string
+        pushType:
+          type: string
+        pushTypeName:
+          type: string

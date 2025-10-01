@@ -1,0 +1,690 @@
+<<<<<<< HEAD
+openapi: 3.0.3
+info:
+  title: KAIDEEPTECH API Gateway
+  version: 1.0.0
+  description: |
+    API Gateway для микросервисов: person-api, library-api, canteen-api.
+    Все методы и поля строго соответствуют proto-файлам.
+servers:
+  - url: http://localhost:8080/api
+paths:
+  /person:
+    post:
+      summary: Создать нового пользователя
+      tags: [person-api]
+=======
+openapi: 3.0.0
+info:
+  title: Chat API Gateway
+  version: 1.0.0
+  description: REST API для gRPC чата (через grpc-gateway)
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /v1/groups:
+    get:
+      summary: Получить список всех групп
+      operationId: listGroups
+      responses:
+        '200':
+          description: Успешно
+    post:
+      summary: Создать новую группу
+      operationId: createGroup
+>>>>>>> master
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+<<<<<<< HEAD
+              $ref: '#/components/schemas/Person'
+            example:
+              pin: "123456"
+              deptCode: "IT"
+              deptName: "Информатика"
+              name: "Иван"
+              lastName: "Иванов"
+              gender: "M"
+              birthday: "1990-01-01"
+              cardNo: "CARD123"
+              supplyCards: ""
+              personPhoto: ""
+              selfPwd: ""
+              isSendMail: false
+              mobilePhone: "+79991234567"
+              personPwd: ""
+              carPlate: "A123BC"
+              email: "ivan@example.com"
+              ssn: "123-45-6789"
+              accLevelIds: "1,2,3"
+              accStartTime: "2023-01-01T00:00:00Z"
+              accEndTime: "2023-12-31T23:59:59Z"
+              certType: "passport"
+              certNumber: "1234567890"
+              photoPath: "/photos/ivan.jpg"
+              hireDate: "2020-01-01"
+              isDisabled: false
+              vilslightPhoto: ""
+              vislightPhotoPath: ""
+              leaveId: ""
+      responses:
+        '200':
+          description: Успешно создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+    get:
+      summary: Получить список всех пользователей
+      tags: [person-api]
+      responses:
+        '200':
+          description: Список пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+      /person/{id}:
+    get:
+      summary: Получить пользователя по ID
+      tags: [person-api]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Данные пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        '404':
+          description: Пользователь не найден
+    put:
+      summary: Обновить пользователя по ID
+      tags: [person-api]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+      responses:
+        '200':
+          description: Обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+    delete:
+      summary: Удалить пользователя по ID
+      tags: [person-api]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Удалено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+  /library/books:
+    post:
+      summary: Добавить книгу
+      tags: [library-api]
+=======
+              $ref: '#/components/schemas/CreateGroupRequest'
+      responses:
+        '200':
+          description: Успешно
+
+  /v1/groups/{group_id}:
+    get:
+      summary: Получить информацию о группе по ID
+      operationId: getGroupById
+      parameters:
+        - name: group_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetGroupByIdResponse'
+
+  /v1/messages/send:
+    post:
+      summary: Отправить сообщение (peer-to-peer или групповое)
+      operationId: sendMessage
+>>>>>>> master
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+<<<<<<< HEAD
+              $ref: '#/components/schemas/AddBookRequest'
+            example:
+              title: Война и мир
+              author: Лев Толстой
+              total_amount: 10
+              location: A1
+      responses:
+        '200':
+          description: Книга добавлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+    get:
+      summary: Получить список всех книг
+      tags: [library-api]
+      responses:
+        '200':
+          description: Список книг
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+  /library/books/{id}:
+    get:
+      summary: Получить книгу по ID
+      tags: [library-api]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Данные книги
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          description: Книга не найдена
+    put:
+      summary: Обновить книгу
+      tags: [library-api]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBookRequest'
+      responses:
+        '200':
+          description: Книга обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+    delete:
+      summary: Удалить книгу
+      tags: [library-api]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Книга удалена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+  /library/rentals:
+    post:
+      summary: Взять книгу в аренду
+      tags: [library-api]
+=======
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        '200':
+          description: Успешно
+
+  /v1/messages/history:
+    post:
+      summary: Получить историю сообщений
+      operationId: getHistory
+>>>>>>> master
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+<<<<<<< HEAD
+              $ref: '#/components/schemas/RentRequest'
+            example:
+              book_id: "0a0c8def-0a49-4273-846a-0d60d00aa7a4"
+              user_id: 2
+      responses:
+        '200':
+          description: Аренда оформлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentConfirmation'
+  /library/rentals/return:
+    post:
+      summary: Вернуть книгу
+      tags: [library-api]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReturnRequest'
+            example:
+              rent_id: "a03ce786-477b-4aea-9c03-c89e7e60b9b9"
+      responses:
+        '200':
+          description: Книга возвращена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Empty'
+  /library/rentals/user/{user_id}:
+    get:
+      summary: Получить список арендованных книг пользователя
+      tags: [library-api]
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Список арендованных книг
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentEvent'
+  /canteen/meals:
+    post:
+      summary: Записать прием пищи
+      tags: [canteen-api]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordMealRequest'
+            example:
+              person_id: 1
+              meal_date: "2024-06-10T12:00:00Z"
+              meal_type: lunch
+              is_free: true
+              total_amount: 0
+              paid_with_card_id: 2
+      responses:
+        '200':
+          description: Прием пищи записан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Meal'
+    get:
+      summary: Получить список всех приемов пищи
+      tags: [canteen-api]
+      parameters:
+        - in: query
+          name: person_id
+          schema:
+            type: integer
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Список приемов пищи
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Meal'
+  /canteen/meals/{id}:
+    get:
+      summary: Получить прием пищи по ID
+      tags: [canteen-api]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Данные приема пищи
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Meal'
+  /canteen/meals/history/{user_id}:
+    get:
+      summary: История приемов пищи пользователя
+      tags: [canteen-api]
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: История приемов пищи
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Meal'
+  /canteen/payments:
+    post:
+      summary: Провести оплату
+      tags: [canteen-api]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+            example:
+              person_id: 1
+              card_id: 2
+              amount: 150.0
+              timestamp: "2024-06-10T12:00:00Z"
+              payment_type: meal
+      responses:
+        '200':
+          description: Оплата проведена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+    get:
+      summary: Получить список всех оплат
+      tags: [canteen-api]
+      parameters:
+        - in: query
+          name: person_id
+          schema:
+            type: integer
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Список оплат
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+  /canteen/payments/{id}:
+    get:
+      summary: Получить оплату по ID
+      tags: [canteen-api]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Данные оплаты
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+  /canteen/payments/history/{user_id}:
+    get:
+      summary: История оплат пользователя
+      tags: [canteen-api]
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: История оплат
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+components:
+  schemas:
+    Person:
+      type: object
+      properties:
+        id: { type: integer, example: 1 }
+        pin: { type: string, example: "123456" }
+        deptName: { type: string, example: "Информатика" }
+        name: { type: string, example: "Иван" }
+        lastName: { type: string, example: "Иванов" }
+        gender: { type: string, example: "M" }
+        birthday: { type: string, example: "1990-01-01" }
+        mobilePhone: { type: string, example: "+79991234567" }
+        email: { type: string, example: "ivan@example.com" }
+        certType: { type: string, example: "passport" }
+        certNumber: { type: string, example: "1234567890" }
+        photoPath: { type: string, example: "/photos/ivan.jpg" }
+        vislightPhotoPath: { type: string, example: "/photos/vislight.jpg" }
+        accLevelIds: { type: string, example: "1,2,3" }
+        inSchool: { type: boolean, example: false }
+        susn: { type: boolean, example: false }
+        parents: { type: string, example: "Иванов И.И., Иванова М.П." }
+        isDisabled: { type: boolean, example: false }
+    DeleteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+    AddBookRequest:
+      type: object
+      properties:
+        title: { type: string, example: "Война и мир" }
+        author: { type: string, example: "Лев Толстой" }
+        total_amount: { type: integer, example: 10 }
+        location: { type: string, example: "A1" }
+    UpdateBookRequest:
+      type: object
+      properties:
+        id: { type: string, example: "2d2725e3-22d1-438a-80d9-3409289d9509" }
+        title: { type: string, example: "Война и мир" }
+        author: { type: string, example: "Лев Толстой" }
+        total_amount: { type: integer, example: 10 }
+        available_amount: { type: integer, example: 8 }
+        location: { type: string, example: "A1" }
+    Book:
+      type: object
+      properties:
+        id: { type: string, example: "2d2725e3-22d1-438a-80d9-3409289d9509" }
+        title: { type: string, example: "Война и мир" }
+        author: { type: string, example: "Лев Толстой" }
+        total_amount: { type: integer, example: 10 }
+        available_amount: { type: integer, example: 8 }
+        location: { type: string, example: "A1" }
+    RentRequest:
+      type: object
+      properties:
+        book_id: { type: string, example: "0a0c8def-0a49-4273-846a-0d60d00aa7a4" }
+        user_id: { type: integer, example: 2 }
+    ReturnRequest:
+      type: object
+      properties:
+        rent_id: { type: string, example: "a03ce786-477b-4aea-9c03-c89e7e60b9b9" }
+    RentEvent:
+      type: object
+      properties:
+        id: { type: string }
+        book_id: { type: string }
+        user_id: { type: integer }
+        rented_at: { type: string, format: date-time }
+        returned_at: { type: string, format: date-time, nullable: true }
+    RentConfirmation:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/RentEvent'
+    Empty:
+      type: object
+    RecordMealRequest:
+      type: object
+      properties:
+        person_id: { type: integer, example: 1 }
+        meal_date: { type: string, format: date-time, example: "2024-06-10T12:00:00Z" }
+        meal_type: { type: string, example: lunch }
+        is_free: { type: boolean, example: true }
+        total_amount: { type: number, example: 0 }
+        paid_with_card_id: { type: integer, example: 2 }
+    Meal:
+      type: object
+      properties:
+        id: { type: integer }
+        person_id: { type: integer }
+        meal_date: { type: string, format: date-time }
+        meal_type: { type: string, example: lunch }
+        is_free: { type: boolean }
+        total_amount: { type: number }
+        paid_with_card_id: { type: integer }
+    PaymentRequest:
+      type: object
+      properties:
+        person_id: { type: integer, example: 1 }
+        card_id: { type: integer, example: 2 }
+        amount: { type: number, example: 150.0 }
+        timestamp: { type: string, format: date-time, example: "2024-06-10T12:00:00Z" }
+        payment_type: { type: string, example: meal }
+    Payment:
+      type: object
+      properties:
+        id: { type: integer }
+        person_id: { type: integer }
+        card_id: { type: integer }
+        amount: { type: number }
+        timestamp: { type: string, format: date-time }
+        payment_type: { type: string, example: meal } 
+=======
+              $ref: '#/components/schemas/GetHistoryRequest'
+      responses:
+        '200':
+          description: Успешно
+
+components:
+  schemas:
+    CreateGroupRequest:
+      type: object
+      properties:
+        group_id:
+          type: string
+        group_name:
+          type: string
+        creator_id:
+          type: string
+        members:
+          type: array
+          items:
+            type: string
+
+    GetGroupByIdResponse:
+      type: object
+      properties:
+        group_id:
+          type: string
+        group_name:
+          type: string
+        creator_id:
+          type: string
+        members:
+          type: array
+          items:
+            type: string
+
+    SendMessageRequest:
+      type: object
+      properties:
+        chat_id:
+          type: string
+        sender_id:
+          type: string
+        receiver_id:
+          type: string
+        content:
+          type: string
+        file_url:
+          type: string
+        file_name:
+          type: string
+        file_type:
+          type: string
+
+    GetHistoryRequest:
+      type: object
+      properties:
+        chat_id:
+          type: string
+        limit:
+          type: integer
+        offset:
+          type: integer
+>>>>>>> master

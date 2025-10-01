@@ -1,0 +1,10 @@
+stages:
+  - containerize
+  - deploy
+
+include:
+  - project: 'kai-deep-tech/devops/pipelines/containerize'
+    file: 'containerize.yml'
+  - project: 'kai-deep-tech/devops/pipelines/deploy'
+    file: 'deploy.yml'
+    ref: 'dev'

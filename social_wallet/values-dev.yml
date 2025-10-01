@@ -1,0 +1,65 @@
+imagePullSecrets: 
+  - name: gitlab-registry
+nameOverride: "name-will-be-changed"
+
+service:
+  type: ClusterIP
+  port: 8080
+
+image:
+  repository: repo-will-be-changed
+  # This sets the pull policy for images.
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: tag-will-be-changed
+
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+env:
+  INTERNAL_PORT: 8080
+  CHAT_API_URL: "chat-api"
+  LIBRARY_API_URL: "library-api"
+  CANTEEN_API_URL: "canteen-api"
+  PERSON_API_URL: "person-api"
+  SOCIAL_WALLET_API_URL: "social-wallet"
+  PERSON_DUMPER_API_URL: "person-dumper"
+  DB_HOST: 10.2.13.16
+  DB_PORT: 5432
+  DB_USER: dev
+  DB_PASSWORD: DevUserKai1!
+  DB_NAME: school-dev
+  SW_ENDPOINT: https://api.dev.socialwallet.kz/api/v1/sdu/meal/transaction
+  SW_USER: HM_Biometrics
+  SW_PASS: T!agBYN)Bd7
+  SW_TIMEOUT: 10s
+
+
+
+
+extraVolumeMounts:
+  - name: kai-deep-tech-logs
+    mountPath: /var/log/kai-deep-tech
+
+extraVolumes:
+  - name: kai-deep-tech-logs
+    hostPath:
+      path: /var/log/kai-deep-tech
+

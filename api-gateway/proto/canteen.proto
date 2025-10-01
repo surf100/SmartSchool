@@ -1,0 +1,140 @@
+syntax = "proto3";
+
+package canteenpb;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "api-gateway/proto/gen/canteenpb";
+
+// Meal Service for recording meals
+service MealService {
+  rpc RecordMeal (RecordMealRequest) returns (Meal) {
+    option (google.api.http) = {
+      post: "/api/canteen/meals"
+      body: "*"
+    };
+  }
+  
+  rpc GetMeal (MealIDRequest) returns (Meal) {
+    option (google.api.http) = {
+      get: "/api/canteen/meals/{id}"
+    };
+  }
+  
+  rpc ListMeals (ListMealsRequest) returns (MealList) {
+    option (google.api.http) = {
+      get: "/api/canteen/meals"
+    };
+  }
+  
+  rpc GetMealHistory (UserIDRequest) returns (MealList) {
+    option (google.api.http) = {
+      get: "/api/canteen/meals/history/{user_id}"
+    };
+  }
+}
+
+// Payment Service for transactions
+service PaymentService {
+  rpc ProcessPayment (PaymentRequest) returns (Payment) {
+    option (google.api.http) = {
+      post: "/api/canteen/payments"
+      body: "*"
+    };
+  }
+  
+  rpc GetPayment (PaymentIDRequest) returns (Payment) {
+    option (google.api.http) = {
+      get: "/api/canteen/payments/{id}"
+    };
+  }
+  
+  rpc ListPayments (ListPaymentsRequest) returns (PaymentList) {
+    option (google.api.http) = {
+      get: "/api/canteen/payments"
+    };
+  }
+  
+  rpc GetPaymentHistory (UserIDRequest) returns (PaymentList) {
+    option (google.api.http) = {
+      get: "/api/canteen/payments/history/{user_id}"
+    };
+  }
+}
+
+message Empty {}
+
+// Meal model based on meals table
+message Meal {
+  int32 id = 1;
+  int32 person_id = 2;
+  google.protobuf.Timestamp meal_date = 3;
+  string meal_type = 4; // breakfast, lunch, dinner
+  bool is_free = 5;
+  double total_amount = 6;
+  int32 paid_with_card_id = 7;
+}
+
+// Payment model based on payments table
+message Payment {
+  int32 id = 1;
+  int32 person_id = 2;
+  int32 card_id = 3;
+  double amount = 4;
+  google.protobuf.Timestamp timestamp = 5;
+  string payment_type = 6; // meal, other
+}
+
+// MealService messages
+message RecordMealRequest {
+  int32 person_id = 1;
+  google.protobuf.Timestamp meal_date = 2;
+  string meal_type = 3;
+  bool is_free = 4;
+  double total_amount = 5;
+  int32 paid_with_card_id = 6;
+}
+
+message MealIDRequest {
+  int32 id = 1;
+}
+
+message ListMealsRequest {
+  // Optional filters
+  int32 person_id = 1;
+  google.protobuf.Timestamp start_date = 2;
+  google.protobuf.Timestamp end_date = 3;
+}
+
+message MealList {
+  repeated Meal meals = 1;
+}
+
+// PaymentService messages
+message PaymentRequest {
+  int32 person_id = 1;
+  int32 card_id = 2;
+  double amount = 3;
+  google.protobuf.Timestamp timestamp = 4;
+  string payment_type = 5;
+}
+
+message PaymentIDRequest {
+  int32 id = 1;
+}
+
+message ListPaymentsRequest {
+  // Optional filters
+  int32 person_id = 1;
+  google.protobuf.Timestamp start_date = 2;
+  google.protobuf.Timestamp end_date = 3;
+}
+
+message PaymentList {
+  repeated Payment payments = 1;
+}
+
+message UserIDRequest {
+  int32 user_id = 1;
+} 

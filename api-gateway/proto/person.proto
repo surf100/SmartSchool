@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package personpb;
+
+import "google/api/annotations.proto";
+
+option go_package = "api-gateway/proto/gen/personpb";
+
+service PersonService {
+  rpc CreatePerson(CreatePersonRequest) returns (Person) {
+    option (google.api.http) = {
+      post: "/api/v1/persons"
+      body: "*"
+    };
+  }
+  rpc GetPerson(GetPersonRequest) returns (Person) {
+    option (google.api.http) = {
+      get: "/api/v1/persons/{pin}"
+    };
+  }
+  rpc ListPersons(ListPersonsRequest) returns (ListPersonsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/persons"
+    };
+  }
+  rpc UpdatePerson(UpdatePersonRequest) returns (Person) {
+    option (google.api.http) = {
+      put: "/api/v1/persons/{person.pin}"
+      body: "*"
+    };
+  }
+  rpc DeletePerson(DeletePersonRequest) returns (DeletePersonResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/persons/{pin}"
+    };
+  }
+
+  // Специальные запросы
+  rpc GetPersonParents(GetPersonParentsRequest) returns (GetPersonParentsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/persons/{pin}/parents"
+    };
+  }
+
+  rpc GetChildrenByParentID(GetChildrenByParentIDRequest) returns (GetChildrenByParentIDResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/persons/parent/{parent_id}/children"
+    };
+  }
+
+  rpc GetPersonTransactions(GetPersonTransactionsRequest) returns (GetPersonTransactionsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/persons/{pin}/transactions"
+    };
+  }
+
+  // Поиск и фильтрация
+  rpc SearchPersons(SearchPersonsRequest) returns (SearchPersonsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/persons/search"
+    };
+  }
+  rpc GetPersonsByDepartment(GetPersonsByDepartmentRequest) returns (ListPersonsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/persons/department/{department_id}"
+    };
+  }
+  rpc UpsertByPin (personpb.UpsertByPinRequest) returns (personpb.UpsertByPinResponse) {
+    option (google.api.http) = {
+      post: "/v1/persons-dumper/person:upsert"
+      body: "*"  
+    };
+  }
+} 

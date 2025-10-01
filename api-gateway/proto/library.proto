@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+package librarypb;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "api-gateway/proto/gen/librarypb";
+
+// Book Service for library workers
+service BookService {
+  rpc AddBook (AddBookRequest) returns (Book) {
+    option (google.api.http) = {
+      post: "/api/library/books"
+      body: "*"
+    };
+  }
+  
+  rpc UpdateBook (UpdateBookRequest) returns (Book) {
+    option (google.api.http) = {
+      put: "/api/library/books"
+      body: "*"
+    };
+  }
+  
+  rpc DeleteBook (BookIDRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      delete: "/api/library/books/{id}"
+    };
+  }
+  
+  rpc GetBook (BookIDRequest) returns (Book) {
+    option (google.api.http) = {
+      get: "/api/library/books/{id}"
+    };
+  }
+  
+  rpc ListBooks (Empty) returns (BookList) {
+    option (google.api.http) = {
+      get: "/api/library/books"
+    };
+  }
+}
+
+// Rental Service for students
+service RentalService {
+  rpc RentBook (RentRequest) returns (RentConfirmation) {
+    option (google.api.http) = {
+      post: "/api/library/rentals"
+      body: "*"
+    };
+  }
+  
+  rpc ReturnBook (ReturnRequest) returns (Empty) {
+    option (google.api.http) = {
+      post: "/api/library/rentals/return"
+      body: "*"
+    };
+  }
+  
+  rpc ListRentedBooks (UserIDRequest) returns (RentList) {
+    option (google.api.http) = {
+      get: "/api/library/rentals/user/{user_id}"
+    };
+  }
+}
+
+message Empty {}
+
+// Book model
+message Book {
+  string id = 1;
+  string title = 2;
+  string author = 3;
+  int32 total_amount = 4;
+  int32 available_amount = 5;
+  string location = 6;
+}
+
+// RentEvent model
+message RentEvent {
+  string id = 1;
+  string book_id = 2;
+  int32 user_id = 3;
+  google.protobuf.Timestamp rented_at = 4;
+  google.protobuf.Timestamp returned_at = 5;
+}
+
+// BookService messages
+message AddBookRequest {
+  string title = 1;
+  string author = 2;
+  int32 total_amount = 3;
+  string location = 4;
+}
+
+message UpdateBookRequest {
+  string id = 1;
+  string title = 2;
+  string author = 3;
+  int32 total_amount = 4;
+  int32 available_amount = 5;
+  string location = 6;
+}
+
+message BookIDRequest {
+  string id = 1;
+}
+
+message BookList {
+  repeated Book books = 1;
+}
+
+message DeleteResponse {
+  bool success = 1;
+}
+
+// RentalService messages
+message RentRequest {
+  string book_id = 1;
+  int32 user_id = 2;
+}
+
+message RentConfirmation {
+  RentEvent event = 1;
+}
+
+message ReturnRequest {
+  string rent_id = 1;
+}
+
+message UserIDRequest {
+  int32 user_id = 1;
+}
+
+message RentList {
+  repeated RentEvent events = 1;
+} 

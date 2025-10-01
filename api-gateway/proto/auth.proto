@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package authpb;
+
+import "google/api/annotations.proto";
+
+option go_package = "api-gateway/proto/gen/authpb";
+
+// Auth Service for user authentication
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/login"
+      body: "*"
+    };
+  }
+}
+
+message LoginRequest {
+  string pin = 1;
+  string mobilePhone = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+  Person person = 2;
+}
+
+message Person {
+  string id = 1;
+  string pin = 2;
+  optional string deptCode = 3;
+  optional string deptName = 4;
+  string firstName = 5;
+  string lastName = 6;
+  optional string gender = 7;
+  optional string birthday = 8; // ISO 8601 format
+  optional string cardNo = 9;
+  optional string supplyCards = 10;
+  optional string personPhoto = 11;
+  optional string selfPwd = 12;
+  optional bool isSendMail = 13;
+  optional string mobilePhone = 14;
+  optional string personPwd = 15;
+  optional string carPlate = 16;
+  optional string email = 17;
+  optional string ssn = 18;
+  optional string accLevelIds = 19;
+  optional string accStartTime = 20; // ISO 8601 format
+  optional string accEndTime = 21; // ISO 8601 format
+  optional string certType = 22;
+  optional string certNumber = 23;
+  optional string photoPath = 24;
+  optional string hireDate = 25; // ISO 8601 format
+  bool isDisabled = 26;
+  optional string vislightPhoto = 27;
+  optional string vislightPhotoPath = 28;
+  optional string leaveId = 29;
+  optional string parentIin = 30;
+  bool inSchool = 31;
+  bool susn = 32;
+  optional string schoolBin = 33;
+  optional string cardNumber = 34;
+  int32 balance = 35;
+}

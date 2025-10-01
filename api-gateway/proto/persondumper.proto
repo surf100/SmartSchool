@@ -1,0 +1,33 @@
+syntax = "proto3";
+package personsdumper.v1;
+option go_package = "api-gateway/proto/gen/persondumperpb;persondumperpb";
+import "google/api/annotations.proto";
+
+message TriggerFullSyncRequest { bool dry_run = 1; }
+message TriggerFullSyncResponse { string run_id = 1; int32 scheduled = 2; }
+
+message TriggerSchoolSyncRequest {
+  oneof key { int64 school_id = 1; string bin = 2; }
+  bool dry_run = 3;
+}
+message TriggerSchoolSyncResponse { string run_id = 1; }
+
+message GetSyncRunsRequest { optional int64 school_id = 1; int32 limit = 2; }
+message SyncRun {
+  string run_id = 1; int64 school_id = 2;
+  string started_at = 3; string finished_at = 4;
+  int32 total = 5; int32 inserted = 6; int32 updated = 7; int32 failed = 8; bool ok = 9;
+}
+message GetSyncRunsResponse { repeated SyncRun runs = 1; }
+
+service PersonsDumper {
+  rpc TriggerFullSync(TriggerFullSyncRequest) returns (TriggerFullSyncResponse) {
+    option (google.api.http) = { post: "/v1/persons-dumper/sync:full" body: "*" };
+  }
+  rpc TriggerSchoolSync(TriggerSchoolSyncRequest) returns (TriggerSchoolSyncResponse) {
+    option (google.api.http) = { post: "/v1/persons-dumper/sync:school" body: "*" };
+  }
+  rpc GetSyncRuns(GetSyncRunsRequest) returns (GetSyncRunsResponse) {
+    option (google.api.http) = { get: "/v1/persons-dumper/sync-runs" };
+  }
+}

@@ -2,56 +2,43 @@ package entity
 
 import "time"
 
-type AccessMapping struct {
-	ReaderName string
-	Pin        string
-}
-
-type Student struct {
-	Pin       string
-	IIN       string
-	SchoolBin string
-	SetSocPay bool
-}
-
-type AccessEvent struct {
-	Pin        string
-	ReaderName string
-	EventTime  time.Time
-	RawJSON    string
-}
-type TerminalPayload struct {
-	Module     string `json:"module"`
-	DataType   string `json:"dataType"`
-	ModuleName string `json:"moduleName"`
-	Data       string `json:"content"`
-	PushType   string `json:"pushType,omitempty"`
-}
-
-type TransactionRequest struct {
-	IIN         string `json:"iin" validate:"required,len=12"`
-	Date        string `json:"date" validate:"required,datetime=2006-01-02 15:04:05"`
-	SchoolBIN   string `json:"school_bin" validate:"required,len=12"`
-	SetSocPay   string `json:"set_socpay"`
-	ResetSocPay string `json:"reset_socpay"`
-}
-
 type Person struct {
-	Pin               string `json:"pin" bson:"pin" db:"pin"`
-	DeptName          string `json:"deptname" bson:"deptname" db:"deptname"`
-	Name              string `json:"name" bson:"name" db:"name"`
-	LastName          string `json:"lastname" bson:"lastname" db:"lastname"`
-	Gender            string `json:"gender" bson:"gender" db:"gender"`
-	Birthday          string `json:"birthday" bson:"birthday" db:"birthday"`
-	MobilePhone       string `json:"mobilephone" bson:"mobilephone" db:"mobilephone"`
-	Email             string `json:"email" bson:"email" db:"email"`
-	CertType          string `json:"certtype" bson:"certtype" db:"certtype"`
-	CertNumber        string `json:"certnumber" bson:"certnumber" db:"certnumber"`
-	PhotoPath         string `json:"photopath" bson:"photopath" db:"photopath"`
-	VislightPhotoPath string `json:"vislightphotopath" bson:"vislightphotopath" db:"vislightphotopath"`
-	AccLevelIds       string `json:"acclevelids" bson:"acclevelids" db:"acclevelids"`
-	ParentIin         string `json:"parentiin" bson:"parentiin" db:"parentiin"`
-	InSchool          bool   `json:"inschool" bson:"inschool" db:"inschool"`
-	Susn              bool   `json:"susn" bson:"susn" db:"susn"`
-	SetSocPay         bool   `json:"set_socpay" bson:"set_socpay" db:"set_socpay"` 
+	Pin        string `json:"pin" db:"pin"`
+	IIN        string `json:"iin" db:"iin"`
+	SchoolBin  string `json:"school_bin" db:"school_bin"`
+	Susn       bool   `json:"susn" db:"susn"`
+	CardNumber string `json:"card_number" db:"card_number"`
+}
+
+type ExternalSusnData struct {
+	ID            int
+	IIN           string
+	SchoolBin     string
+	SocialPayment bool
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+}
+
+type ZKBioEvent struct {
+	Pin              string `json:"pin"`
+	Name             string `json:"name"`
+	LastName         string `json:"lastName"`
+	DeptCode         string `json:"deptCode"`
+	DeptName         string `json:"deptName"`
+	ReaderName       string `json:"readerName"`
+	DoorName         string `json:"doorName"`
+	DevSn            string `json:"devSn"`
+	CapturePhotoPath string `json:"capturePhotoPath"`
+	VerifyModeName   string `json:"verifyModeName"`
+	EventName        string `json:"eventName"`
+	EventTime        int64  `json:"eventTime"` 
+}
+
+type ZKBioPushRequest struct {
+	Module       string `json:"module"`
+	DataType     string `json:"dataType"`
+	ModuleName   string `json:"moduleName"`
+	Content      string `json:"content"` 
+	PushType     string `json:"pushType"`
+	PushTypeName string `json:"pushTypeName"`
 }

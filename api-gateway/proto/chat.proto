@@ -1,0 +1,185 @@
+syntax = "proto3";
+
+package chatpb;
+
+import "google/api/annotations.proto";
+
+option go_package = "chat-api/proto/gen";
+
+
+service ChatService {
+  rpc SendMessageRest(ChatMessage) returns (SendResponse) {
+  option (google.api.http) = {
+    post: "/api/send"
+    body: "*"
+    };
+  }
+  
+  rpc SendMessage(stream ChatMessage) returns (stream ChatMessage);
+
+
+  rpc CreateGroup(Group) returns (SimpleResponse) {
+    option (google.api.http) = {
+      post: "/api/group"
+      body: "*"
+    };
+  }
+
+ rpc AddGroupMember(GroupMemberRequest) returns (SimpleResponse) {
+  option (google.api.http) = {
+    post: "/v1/groups/{group_id}/members"
+    body: "*"
+  };
+}
+
+
+
+  rpc RemoveGroupMember(GroupMemberRequest) returns (SimpleResponse) {
+    option (google.api.http) = {
+      post: "/api/group/{group_id}/remove-member"
+      body: "*"
+    };
+  }
+
+  rpc GetGroupMembers(GroupID) returns (GroupMembersResponse) {
+    option (google.api.http) = {
+      get: "/api/group/{group_id}/members"
+    };
+  }
+
+  rpc GetHistory(ChatHistoryRequest) returns (ChatHistoryResponse) {
+    option (google.api.http) = {
+      get: "/api/history"
+    };
+  }
+
+  rpc EditMessage(EditMessageRequest) returns (SimpleResponse) {
+    option (google.api.http) = {
+      put: "/api/message/{message_id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteMessage(DeleteMessageRequest) returns (SimpleResponse) {
+    option (google.api.http) = {
+      delete: "/api/message/{message_id}"
+    };
+  }
+
+  rpc Init(UserRequest) returns (StatusResponse) {
+    option (google.api.http) = {
+      post: "/api/init"
+      body: "*"
+    };
+  }
+
+
+  rpc SendTypingStatus(stream TypingStatus) returns (stream TypingStatus);
+}
+
+
+message ChatMessage {
+  string chat_id = 1;
+  string sender_id = 2;
+  string receiver_id = 3;
+  string content = 4;
+  string sent_at = 5;
+  bool is_delivered = 6;
+  string delivered_at = 7;
+  bool is_group = 8;
+  string file_url = 9;
+  string file_type = 10;
+  string file_name = 11;
+}
+
+message TypingStatus {
+  string sender_id = 1;
+  string receiver_id = 2;
+  bool is_typing = 3;
+}
+
+
+
+message Group {
+  string id = 1;
+  string group_name = 2;
+  string creator_id = 3;
+  repeated string members = 4;
+}
+
+message GroupID {
+  string group_id = 1;
+}
+
+message GroupMemberRequest {
+  string group_id = 1;
+  string user_id = 2;
+}
+
+message GroupMembersResponse {
+  repeated string members = 1;
+}
+
+
+message ChatHistoryRequest {
+  string chat_id = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message ChatHistoryResponse {
+  repeated ChatMessage messages = 1;
+}
+
+
+
+message EditMessageRequest {
+  string message_id = 1;
+  string new_content = 2;
+}
+
+message DeleteMessageRequest {
+  string message_id = 1;
+}
+
+message SimpleResponse {
+  string message = 1;
+  bool success = 2;
+}
+
+message AddMemberRequest {
+  string group_id = 1;
+  string user_id = 2;
+}
+message UserRequest {
+  string user_id = 1;
+}
+
+message StatusResponse {
+  string status = 1;
+}
+
+
+message SendMessageRequest {
+  string sender_id = 1;
+  string receiver_id = 2;
+  string content = 3;
+}
+
+message SendMessageResponse {
+  string status = 1;
+}
+
+message SendResponse {
+  string status = 1;
+}
+
+
+
+message GetMessagesRequest {
+  string chat_id = 1;
+}
+
+message GetMessagesResponse {
+  repeated ChatMessage messages = 1;
+}
