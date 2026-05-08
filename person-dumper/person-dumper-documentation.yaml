@@ -1,0 +1,128 @@
+
+openapi: 3.0.3
+info:
+  title: Person Dumper API
+  version: 1.0.0
+  description: |
+    API для управления синхронизацией данных о людях и школах.
+    Сервис взаимодействует через gRPC, но в данном OpenAPI представлены REST-эндпоинты.
+servers:
+  - url: https://person-dumper.example.com/api/v1
+
+paths:
+  /sync/full:
+    post:
+      summary: Запустить полную синхронизацию
+      description: Запускает полную синхронизацию всех данных.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dry_run:
+                  type: boolean
+                  description: Если true — синхронизация только моделируется
+              required:
+                - dry_run
+      responses:
+        "200":
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  run_id:
+                    type: string
+                    description: ID запущенной задачи
+                  scheduled:
+                    type: integer
+                    description: Статус постановки в очередь
+
+  /sync/school:
+    post:
+      summary: Запустить синхронизацию по школе
+      description: Запускает синхронизацию данных для указанной школы.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                school_id:
+                  type: integer
+                  format: int64
+                  description: ID школы
+                bin:
+                  type: string
+                  description: БИН школы
+                dry_run:
+                  type: boolean
+                  description: Если true — синхронизация только моделируется
+      responses:
+        "200":
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  run_id:
+                    type: string
+                    description: ID задачи
+
+  /sync/runs:
+    get:
+      summary: Получить список синхронизаций
+      description: Возвращает список последних синхронизаций.
+      parameters:
+        - name: school_id
+          in: query
+          schema:
+            type: integer
+            format: int64
+          required: false
+          description: Фильтр по ID школы
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          required: false
+          description: Лимит записей
+      responses:
+        "200":
+          description: Список синхронизаций
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  runs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        run_id:
+                          type: string
+                        school_id:
+                          type: integer
+                          format: int64
+                        started_at:
+                          type: string
+                          format: date-time
+                        finished_at:
+                          type: string
+                          format: date-time
+                        total:
+                          type: integer
+                        inserted:
+                          type: integer
+                        updated:
+                          type: integer
+                        failed:
+                          type: integer
+                        ok:
+                          type: boolean

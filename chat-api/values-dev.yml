@@ -1,0 +1,24 @@
+imagePullSecrets:
+  - name: gitlab-registry
+
+nameOverride: "chat-api"
+
+service:
+  type: ClusterIP
+  port: 8080
+
+image:
+  repository: https://gitlab.com/kai-deep-tech/backend/chat-api
+  pullPolicy: IfNotPresent
+  tag: latest
+
+resources: {}
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+env:
+  MONGO_URI: "mongodb://chatuser:password@mongo:27017/chat"
+  PORT: "8080"

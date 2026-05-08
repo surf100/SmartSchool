@@ -1,0 +1,5 @@
+.git
+*.md
+*.log
+*.ps1
+/tmp

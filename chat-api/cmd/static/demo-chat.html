@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Demo Chat</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+    input, textarea { width: 100%; margin: 5px 0; padding: 8px; }
+    button { padding: 10px; margin-top: 10px; }
+    #messages { border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: scroll; }
+  </style>
+</head>
+<body>
+
+<h2>Demo Chat</h2>
+
+<label>Chat ID:</label>
+<input id="chat_id" placeholder="group1">
+
+<label>Sender ID:</label>
+<input id="sender_id" placeholder="user1">
+
+<label>Receiver ID:</label>
+<input id="receiver_id" placeholder="user2">
+
+<label>Message:</label>
+<textarea id="content" placeholder="Type your message..."></textarea>
+
+<label>Attach file:</label>
+<input type="file" id="file_input">
+
+<button onclick="sendMessage()">Send Message</button>
+
+<h3>Messages:</h3>
+<div id="messages"></div>
+
+<script>
+const API_BASE = 'http://localhost:8080';
+
+function sendMessage() {
+  const msg = {
+    chat_id: document.getElementById('chat_id').value,
+    sender_id: document.getElementById('sender_id').value,
+    receiver_id: document.getElementById('receiver_id').value,
+    content: document.getElementById('content').value,
+    sent_at: new Date().toISOString(),
+    is_delivered: false,
+    is_group: false,
+    file_url: "",
+    file_type: "",
+    file_name: ""
+  };
+
+  socket.send(JSON.stringify(msg)); 
+
+  document.getElementById('content').value = '';
+}
+
+
+async function loadMessages() {
+  const chat_id = document.getElementById('chat_id').value;
+  if (!chat_id) return;
+
+  const res = await fetch(`${API_BASE}/api/history?chat_id=${chat_id}&offset=0&limit=50`);
+
+  const data = await res.json();
+
+  const container = document.getElementById('messages');
+  container.innerHTML = '';
+  (data.messages || []).forEach(msg => {
+    const filePart = msg.file_url ? `<br><a href="${msg.file_url}" target="_blank">📎 ${msg.file_name}</a>` : '';
+    container.innerHTML += `<div><b>${msg.sender_id}</b>: ${msg.content}${filePart}</div>`;
+
+  });
+}
+
+setInterval(loadMessages, 10000);
+
+let socket;
+
+function connectWebSocket(userId) {
+  socket = new WebSocket(`ws://localhost:8080/ws?user_id=${userId}`);
+  
+  socket.onopen = () => {
+    console.log("WebSocket connected");
+  };
+
+  socket.onmessage = function (event) {
+    try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        console.log("Received:", data);
+
+        const messagesDiv = document.getElementById("messages");
+        messagesDiv.innerHTML += `<p><b>${data.sender_id ?? 'unknown'}</b>: ${data.content ?? ''}</p>`;
+
+    } catch (e) {
+        console.error("Error parsing incoming message:", e);
+    }
+};
+
+
+  socket.onerror = (error) => {
+    console.error("WebSocket error:", error);
+  };
+
+  socket.onclose = () => {
+    console.warn("WebSocket closed");
+  };
+}
+document.getElementById('sender_id').addEventListener('blur', () => {
+  const userId = document.getElementById('sender_id').value;
+  if (userId && !socket) {
+    connectWebSocket(userId);
+  }
+});
+
+
+</script>
+
+</body>
+</html>

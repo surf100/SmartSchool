@@ -34,7 +34,7 @@ func mustRegister(name string, fn func() error) {
 		os.Exit(1)
 	}
 }
-
+// 
 func main() {
 	slog.SetDefault(logger.New())
 

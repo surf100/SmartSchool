@@ -1,0 +1,174 @@
+
+openapi: 3.0.1
+info:
+  title: Chat API
+  description: API documentation for the ChatService gRPC API
+  version: 1.0.0
+
+paths:
+  /send_message:
+    post:
+      summary: Send a message in the chat
+      operationId: sendMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatMessage'
+      responses:
+        '200':
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessage'
+  /send_typing_status:
+    post:
+      summary: Send typing status update
+      operationId: sendTypingStatus
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TypingStatus'
+      responses:
+        '200':
+          description: Typing status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TypingStatus'
+  /send_message_rest:
+    post:
+      summary: Send a message using REST
+      operationId: sendMessageRest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatMessage'
+      responses:
+        '200':
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendResponse'
+  /get_history:
+    get:
+      summary: Get chat history
+      operationId: getHistory
+      parameters:
+        - name: chat_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Retrieved chat history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatHistoryResponse'
+  /create_group:
+    post:
+      summary: Create a new chat group
+      operationId: createGroup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        '200':
+          description: Group created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResponse'
+  /add_group_member:
+    post:
+      summary: Add a member to a group
+      operationId: addGroupMember
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupMemberRequest'
+      responses:
+        '200':
+          description: Member added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResponse'
+
+components:
+  schemas:
+    ChatMessage:
+      type: object
+      properties:
+        chat_id:
+          type: string
+        sender_id:
+          type: string
+        receiver_id:
+          type: string
+        content:
+          type: string
+        sent_at:
+          type: string
+        delivered_at:
+          type: string
+        is_delivered:
+          type: boolean
+    TypingStatus:
+      type: object
+      properties:
+        user_id:
+          type: string
+        is_typing:
+          type: boolean
+    SendResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+    ChatHistoryResponse:
+      type: object
+      properties:
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+    Group:
+      type: object
+      properties:
+        group_name:
+          type: string
+        member_ids:
+          type: array
+          items:
+            type: string
+    GroupMemberRequest:
+      type: object
+      properties:
+        group_id:
+          type: string
+        member_id:
+          type: string
+    SimpleResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string

@@ -1,0 +1,68 @@
+﻿syntax = "proto3";
+
+package personpb;
+
+option go_package = "m/third_party/personapi;personpb";
+
+message Person {
+  int32 id = 1;
+  string pin = 2;
+  string deptName = 3;
+  string name = 4;
+  string lastName = 5;
+  string gender = 6;
+  string birthday = 7;
+  string mobilePhone = 8;
+  string email = 9;
+  string certType = 10;
+  string certNumber = 11;
+  string photoPath = 12;
+  string vislightPhotoPath = 13;
+  string accLevelIds = 14;
+  bool inSchool = 15;
+  bool susn = 16;
+  string parents = 17;
+  bool isDisabled = 18;
+}
+
+message GetPersonRequest {
+  int32 id = 1;
+}
+
+message DeletePersonRequest {
+  int32 id = 1;
+}
+
+message ListPersonsResponse {
+  repeated Person persons = 1;
+}
+
+message DeleteResponse {
+  bool success = 1;
+}
+
+message UpsertByPinRequest {
+  string pin       = 1;   
+  string name      = 2;  
+  string lastName  = 3;  
+  string deptName  = 4; 
+  string photoPath = 5;  
+}
+
+message UpsertByPinResponse {
+  bool  created = 1;     
+  int32 id      = 2;    
+   bool changed = 3; 
+}
+
+
+message Empty {}
+
+service PersonService {
+  rpc CreatePerson(Person) returns (Person);
+  rpc GetPerson(GetPersonRequest) returns (Person);
+  rpc ListPersons(Empty) returns (ListPersonsResponse);
+  rpc UpdatePerson(Person) returns (Person);
+  rpc DeletePerson(DeletePersonRequest) returns (DeleteResponse);
+  rpc UpsertByPin(UpsertByPinRequest) returns (UpsertByPinResponse);
+}
